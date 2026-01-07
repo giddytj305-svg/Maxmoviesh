@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MaxMovies | Premium Stream/Download</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Link to External CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- LOADING OVERLAY (Updated with Spinner) -->
+  <div id="loader-overlay">
+    <div class="loader-logo">MaxMovies</div>
+    <div class="loader-spinner"></div>
+  </div>
+
+  <!-- OFFLINE OVERLAY -->
+  <div id="offline-overlay" class="hidden">
+    <div class="offline-content">
+      <div class="offline-icon">
+        <i class="material-icons">wifi_off</i>
+      </div>
+      <h2 class="offline-title">No Internet Connection</h2>
+      <p class="offline-msg">
+        We can't connect to MaxMovies right now. Please check your network settings and try again.
+      </p>
+      <button class="btn-retry" onclick="window.location.reload()">Retry Connection</button>
+    </div>
+  </div>
+
+  <nav class="navbar" role="navigation" aria-label="Primary">
+    <div class="nav-left">
+      <div class="logo" role="link" tabindex="0" onclick="router.navigate('home')">
+          <img src="https://files.catbox.moe/mwvlbd.webp" alt="App Icon" class="nav-logo-icon">
+          MaxMovies
+      </div>
+      <ul class="nav-links" role="menubar" aria-label="Main menu">
+        <li role="menuitem" tabindex="0" onclick="router.navigate('home')" class="active-link">Home</li>
+        <li role="menuitem" tabindex="0" onclick="router.navigate('library')">My Library</li>
+      </ul>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div class="search-wrapper" role="search" aria-label="Search" id="searchWrapper">
+        <i class="material-icons search-icon" id="searchIcon" aria-hidden="true">search</i>
+        <input id="searchInput" type="search" placeholder="Search movies & series..." aria-label="Search movies and series">
+      </div>
+      <div class="hamburger">
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu"><i class="material-icons">menu</i></button>
+        <div class="hamburger-menu" id="hamburgerMenu" aria-hidden="true">
+          <div class="hamburger-menu-header">
+            <span>Menu</span>
+            <button class="close-btn" onclick="toggleHamburger(false)" aria-label="Close menu"><i class="material-icons">close</i></button>
+          </div>
+          <a href="#" onclick="router.navigate('home'); toggleHamburger(false); return false;"><i class="material-icons">home</i> Home</a>
+          <a href="#" onclick="router.navigate('library'); toggleHamburger(false); return false;"><i class="material-icons">library_books</i> Library</a>
+          <a href="about.html" target="_self" onclick="toggleHamburger(false); return true;"><i class="material-icons">info</i> About</a>
+          <a href="ai.html" target="_self" onclick="toggleHamburger(false); return true;"><i class="material-icons">smart_toy</i> Ask AI</a>
+          <a href="portfolio.html" target="_self" onclick="toggleHamburger(false); return true;"><i class="material-icons">work</i>My portfolio</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="home-view" class="view active" role="main" aria-live="polite">
+    <header class="hero" id="hero" aria-label="Featured">
+      <div class="hero-bg-wrapper" aria-hidden="true" id="heroBgWrapper">
+        <img id="heroImage" src="https://via.placeholder.com/1920x1080?text=Loading..." alt="Featured content background image">
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <span class="badge" id="heroBadge">FEATURED</span>
+        <h1 id="heroTitle">Loading...</h1>
+        <p class="hero-meta" id="heroMeta" aria-hidden="false"></p>
+        <p class="hero-desc" id="heroDesc"></p>
+        <div class="hero-buttons" role="group" aria-label="Hero actions">
+          <button class="btn btn-primary" id="heroPlayBtn" aria-label="Play featured">
+            <i class="material-icons" aria-hidden="true">play_arrow</i> <span id="heroPlayText">Play</span>
+          </button>
+          <button class="btn btn-secondary" id="heroInfoBtn" aria-label="More info">
+            <i class="material-icons" aria-hidden="true">info</i> Info
+          </button>
+        </div>
+      </div>
+    </header>
+    <section class="carousels-container" id="carouselsContainer" aria-label="Carousels"></section>
+  </main>
+
+  <section id="library-view" class="view hidden section-padding" aria-labelledby="libraryTitle">
+    <h2 id="libraryTitle" class="section-title">My Library</h2>
+    <div class="library-grid" id="libraryGrid" role="list"></div>
+    <div id="emptyLibraryMsg" class="hidden" style="color:#777; margin-top:20px;">You haven't added anything yet.</div>
+  </section>
+
+  <article id="detail-view" class="view hidden" aria-live="polite">
+    <button class="back-btn" onclick="router.back()" aria-label="Go back">
+      <i class="material-icons" aria-hidden="true">arrow_back</i> Back
+    </button>
+    <section class="detail-hero" id="detailHero" aria-labelledby="detailTitle">
+      <div class="detail-overlay" aria-hidden="true"></div>
+      <div class="detail-content">
+        <img id="detailPoster" src="" alt="Poster image" class="detail-poster" />
+        <div class="detail-info">
+          <div id="typeBadge" class="badge-outline" aria-hidden="true">MOVIE</div>
+          <h1 id="detailTitle">Title</h1>
+          <div class="detail-meta" id="detailMeta" aria-hidden="false"></div>
+          <p id="detailSynopsis" class="detail-description"></p>
+          <div class="action-row" role="group" aria-label="Primary actions">
+            <button class="btn btn-primary" id="detailPlayBtn" aria-label="Play movie">
+              <i class="material-icons" aria-hidden="true">play_arrow</i>
+              <span id="playBtnText">Stream</span>
+            </button>
+            <button class="btn btn-secondary" id="detailLibBtn" aria-pressed="false">
+              <i class="material-icons" aria-hidden="true">add</i> My List
+            </button>
+            <button class="btn btn-secondary" id="detailDownloadBtn">
+              <i class="material-icons" aria-hidden="true">download</i> Download
+            </button>
+          </div>
+          <div id="episodesSection" class="section-padding hidden" style="padding:12px 0 0 0;">
+            <div class="season-header" id="seasonHeader"></div>
+            <h4 style="margin:0 0 8px 0;">Episodes</h4>
+            <div id="episodesGrid" class="episodes-grid" aria-live="polite"></div>
+            <div id="epActionsArea" class="episode-actions-area"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section-padding" aria-labelledby="overviewHeading">
+      <h3 id="overviewHeading" class="section-title">Overview</h3>
+      <p id="overviewText" aria-live="polite" style="color:var(--text-secondary); max-width:900px;"></p>
+    </section>
+    
+    <section class="section-padding hidden" id="trailerSection" aria-labelledby="trailerHeading">
+        <h3 id="trailerHeading" class="section-title">Official Trailer</h3>
+        <div class="trailer-media">
+            <video id="trailer-video-target" class="custom-player" playsinline preload="metadata" controls controlsList="nodownload" 
+                   style="width: 100%; height: auto; max-height: 50vh; object-fit: contain; background: #000; border-radius: 8px;">
+            </video>
+        </div>
+    </section>
+    <section class="section-padding" aria-labelledby="castHeading">
+      <h3 id="castHeading" class="section-title">Cast</h3>
+      <div class="cast-scroller" id="castScroller" role="list" aria-label="Cast list"></div>
+    </section>
+    <section class="section-padding" id="relatedSection" aria-labelledby="relatedHeading">
+      <h3 id="relatedHeading" class="section-title">Related Movies & Series</h3>
+      <div class="carousel-row" id="relatedCarousel" role="list" aria-label="Related titles"></div>
+    </section>
+  </article>
+
+  <section id="downloads-view" class="view hidden section-padding" aria-labelledby="downloadsTitle" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 140px); padding-bottom: 80px;">
+    <div class="download-info-card">
+        <span class="coming-soon-badge">App Coming Soon</span>
+        <div class="d-icon-circle">
+            <i class="material-icons">cloud_download</i>
+        </div>
+        <div class="d-title">MaxMovies App Launch In...</div>
+        
+        <div class="countdown-container" id="launchCountdown">
+            <div class="countdown-item">
+                <div class="countdown-value" id="cd-days">00</div>
+                <div class="countdown-label">Days</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cd-hours">00</div>
+                <div class="countdown-label">Hours</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cd-minutes">00</div>
+                <div class="countdown-label">Minutes</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-value" id="cd-seconds">00</div>
+                <div class="countdown-label">Seconds</div>
+            </div>
+        </div>
+        <p class="d-text" style="margin-top: 25px;">
+            We are working on a dedicated app with a built-in download manager for offline viewing.
+            <br><br>
+            For now, please continue proceed to your <b>Downloads</b> page on your default browser or go to downloads folder on your device to locate your downloaded files.💯
+        </p>
+    </div>
+  </section>
+
+  <section id="player-page-view" class="view hidden player-page-view" aria-live="polite">
+    <div class="video-wrapper" id="playerWrapperPage" role="region" aria-label="Video playback">
+        <div class="video-container controls-visible">
+            <div class="player-header-bar" id="playerHeaderBar">
+                <div class="player-header-left">
+                    <button class="player-header-back-btn btn-secondary" onclick="player.closePage()" aria-label="Close player">
+                        <i class="material-icons">arrow_back</i> BACK
+                    </button>
+                </div>
+                <div class="player-header-actions" role="group">
+                    <div class="caption-button-wrapper">
+                        <select id="captionSelectPage" class="caption-select" aria-label="Select captions">
+                            <option value="">Captions</option>
+                        </select>
+                        <button class="btn-caption" aria-hidden="true" onclick="document.getElementById('captionSelectPage').click();">
+                            <i class="material-icons">closed_caption</i> Captions
+                        </button>
+                    </div>
+                </div>
+            </div>
+          <video id="video-target-page" class="custom-player" playsinline preload="metadata" controls></video>
+        </div>
+        
+        <div id="player-title-bar" class="player-title-bar">
+            <h2 id="player-main-title" class="player-main-title">Loading Title...</h2>
+            <div id="player-meta-row" class="player-meta-row">
+                </div>
+        </div>
+        
+        <div id="player-extra-info">
+            </div>
+    </div>
+    <section class="section-padding" aria-labelledby="forYouHeading">
+        <h3 id="forYouHeading" class="section-title" style="margin-top:20px;">Hollywood Movies</h3>
+        <div class="carousel-row" id="forYouCarousel" role="list" aria-label="Recommended titles"></div>
+    </section>
+  </section>
+
+  <nav class="footer-nav" role="navigation" aria-label="Footer navigation">
+    <button class="foot-btn" onclick="router.navigate('home')" aria-label="Home" data-route="home"><i class="material-icons">home</i><span>Home</span></button>
+    <button class="foot-btn" onclick="router.navigate('library')" aria-label="Library" data-route="library"><i class="material-icons">library_books</i><span>Library</span></button>
+    <button class="foot-btn" onclick="router.navigate('downloads')" aria-label="Downloads" data-route="downloads"><i class="material-icons">download_for_offline</i><span>Downloads</span></button>
+    <button class="foot-btn" onclick="ui.openSearch()" aria-label="Search"><i class="material-icons">search</i><span>Search</span></button>
+  </nav>
+
+  <div id="contextModalOverlay" class="context-modal-overlay hidden">
+    <div class="context-modal">
+        <h4 id="contextModalTitle">Options</h4>
+        <button id="contextRemoveBtn" onclick="player.removeFromRecentlyWatched()"><i class="material-icons">delete_forever</i> Remove from Recently Watched</button>
+    </div>
+  </div>
+
+  <!-- Link to External JS -->
+  <script src="script.js"></script>
+</body>
+</html>
